@@ -2,12 +2,7 @@
 
 namespace Joshembling\ImageOptimizer;
 
-use Filament\Forms\Components\BaseFileUpload;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\AliasLoader;
-use Joshembling\ImageOptimizer\Components\BaseFileUpload as CustomBaseFileUpload;
-use Joshembling\ImageOptimizer\Components\SpatieMediaLibraryFileUpload as CustomSpatieMediaLibraryFileUpload;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -16,11 +11,8 @@ class ImageOptimizerServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'image-optimizer';
 
-    public function boot()
-    {
-        AliasLoader::getInstance()->alias(BaseFileUpload::class, CustomBaseFileUpload::class);
-        AliasLoader::getInstance()->alias(SpatieMediaLibraryFileUpload::class, CustomSpatieMediaLibraryFileUpload::class);
-    }
+    // NOTE: Filament v4: do not alias/override Filament core classes.
+    // Users should import Joshembling\ImageOptimizer\Components\FileUpload (and/or SpatieMediaLibraryFileUpload) explicitly.
 
     public function configurePackage(Package $package): void
     {
@@ -48,10 +40,14 @@ class ImageOptimizerServiceProvider extends PackageServiceProvider
     {
         // Handle Stubs
         if (app()->runningInConsole()) {
-            foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
-                $this->publishes([
-                    $file->getRealPath() => base_path("stubs/image-optimizer/{$file->getFilename()}"),
-                ], 'image-optimizer-stubs');
+            $stubsPath = __DIR__ . '/../stubs/';
+
+            if (is_dir($stubsPath)) {
+                foreach (app(Filesystem::class)->files($stubsPath) as $file) {
+                    $this->publishes([
+                        $file->getRealPath() => base_path("stubs/image-optimizer/{$file->getFilename()}"),
+                    ], 'image-optimizer-stubs');
+                }
             }
         }
     }
