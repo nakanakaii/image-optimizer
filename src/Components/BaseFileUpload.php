@@ -983,9 +983,9 @@ class BaseFileUpload extends Field
     /**
      * @return array<string, string>
      */
-    public function getStateToDehydrate(): array
+    public function getStateToDehydrate(mixed $state): array
     {
-        $state = parent::getStateToDehydrate();
+        $state = parent::getStateToDehydrate($state);
 
         if ($fileNamesStatePath = $this->getFileNamesStatePath()) {
             $state = [
